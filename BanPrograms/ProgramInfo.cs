@@ -6,7 +6,7 @@ using System.Windows.Forms;
 
 namespace BanPrograms
 {
-    internal static class Program
+    internal static class ProgramInfo
     {
         /// <summary>
         /// Главная точка входа для приложения.
