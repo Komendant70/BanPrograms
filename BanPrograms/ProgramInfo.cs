@@ -6,17 +6,16 @@ using System.Windows.Forms;
 
 namespace BanPrograms
 {
-    internal static class ProgramInfo
+    public class ProgramInfo
     {
-        /// <summary>
-        /// Главная точка входа для приложения.
-        /// </summary>
-        [STAThread]
-        static void Main()
-        {
-            Application.EnableVisualStyles();
-            Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new Form1());
-        }
+        public string Name { get; set; }
+        public string Path { get; set; }
+        public string Hash { get; set; }
+    }
+
+    public class ProgramList
+    {
+        public bool Enabled { get; set; }
+        public List<ProgramInfo> Programs { get; set; }
     }
 }
