@@ -58,6 +58,7 @@
     </Compile>
     <Compile Include="Logger.cs" />
     <Compile Include="MonitorService.cs" />
+    <Compile Include="Program.cs" />
     <Compile Include="ProgramInfo.cs" />
     <Compile Include="ProgramListManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
