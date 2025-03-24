@@ -40,7 +40,7 @@ namespace BanPrograms
             {
                 lstPrograms.Items.Add($"{program.Name} ({program.Path})");
             }
-            btnToggle.Text = list.Enabled ? "Выключить" : "Включить";
+            btnToggle.Text = list.Enabled ? "Enable" : "Disable";
         }
 
         private void btnAdd_Click(object sender, EventArgs e)
@@ -84,6 +84,11 @@ namespace BanPrograms
             monitor.UpdateCache();
             if (list.Enabled) monitor.Start(); else monitor.Stop();
             LoadProgramList();
+        }
+
+        private void MainForm_Load(object sender, EventArgs e)
+        {
+
         }
     }
 }
