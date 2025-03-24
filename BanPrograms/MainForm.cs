@@ -8,17 +8,18 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using MetroFramework.Forms;
 
 namespace BanPrograms
 {
-    public partial class MainForm : Form
+    public partial class MainForm : MetroForm
     {
         private ProgramListManager manager = new ProgramListManager();
         private MonitorService monitor = new MonitorService();
 
         public MainForm()
         {
-            InitializeComponent(); // Этот метод сгенерирован дизайнером
+            InitializeComponent();
             CheckAdminRights();
             LoadProgramList();
         }
@@ -27,7 +28,7 @@ namespace BanPrograms
         {
             if (!manager.IsAdmin())
             {
-                MessageBox.Show("Требуются права администратора!", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Administrator rights required!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 btnAdd.Enabled = btnRemove.Enabled = btnToggle.Enabled = false;
             }
         }
@@ -40,7 +41,8 @@ namespace BanPrograms
             {
                 lstPrograms.Items.Add($"{program.Name} ({program.Path})");
             }
-            btnToggle.Text = list.Enabled ? "Enable" : "Disable";
+            btnToggle.Checked = list.Enabled;
+            btnToggle.Enabled = list.Programs.Count > 0;
         }
 
         private void btnAdd_Click(object sender, EventArgs e)
@@ -53,7 +55,7 @@ namespace BanPrograms
                     string hash = manager.CalculateHash(ofd.FileName);
                     list.Programs.Add(new ProgramInfo
                     {
-                        Name = Path.GetFileName(ofd.FileName),
+                        Name = System.IO.Path.GetFileName(ofd.FileName),
                         Path = ofd.FileName,
                         Hash = hash
                     });
@@ -76,19 +78,33 @@ namespace BanPrograms
             }
         }
 
-        private void btnToggle_Click(object sender, EventArgs e)
+        private void btnToggle_CheckedChanged(object sender, EventArgs e)
         {
             var list = manager.LoadList();
-            list.Enabled = !list.Enabled;
+            list.Enabled = btnToggle.Checked;
             manager.SaveList(list);
             monitor.UpdateCache();
-            if (list.Enabled) monitor.Start(); else monitor.Stop();
+
+            if (list.Enabled)
+            {
+                if (list.Programs.Count == 0)
+                {
+                    MessageBox.Show("No programs in the banned list. Add programs to block.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                }
+                else
+                {
+                    System.Diagnostics.Debug.WriteLine("System enabled, starting monitor...");
+                    monitor.Start();
+                }
+            }
+            else
+            {
+                System.Diagnostics.Debug.WriteLine("System disabled, stopping monitor...");
+                monitor.Stop();
+            }
             LoadProgramList();
         }
 
-        private void MainForm_Load(object sender, EventArgs e)
-        {
-
-        }
+        
     }
 }

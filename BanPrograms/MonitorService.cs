@@ -70,6 +70,7 @@ namespace BanPrograms
         {
             string processName = e.NewEvent.Properties["ProcessName"].Value.ToString();
             string processId = e.NewEvent.Properties["ProcessID"].Value.ToString();
+            logger.Log($"Process started: {processName} (ID: {processId})");
 
             if (!cachedList.Enabled)
             {
@@ -77,123 +78,35 @@ namespace BanPrograms
                 return;
             }
 
-            try
+            foreach (var banned in cachedList.Programs)
             {
-                bool isBanned = false;
-                string filePath = null;
-                string hash = null;
-                string reason = null;
-                string user = GetProcessUser(int.Parse(processId));
-
-                // Проверяем по имени процесса
-                foreach (var program in cachedList.Programs)
-                {
-                    if (program.Name.Equals(processName, StringComparison.OrdinalIgnoreCase))
-                    {
-                        isBanned = true;
-                        reason = "Name match";
-                        break;
-                    }
-                }
-
-                // Если процесс помечен как запрещённый по имени
-                if (isBanned)
+                if (processName.Equals(banned.Name, StringComparison.OrdinalIgnoreCase))
                 {
                     try
                     {
                         Process process = Process.GetProcessById(int.Parse(processId));
-                        filePath = process.MainModule.FileName;
-                        hash = manager.CalculateHash(filePath);
-
-                        foreach (var program in cachedList.Programs)
+                        if (!process.HasExited) // Проверяем, не завершился ли процесс
                         {
-                            if (program.Path == filePath)
-                            {
-                                reason = "Path match";
-                                process.Kill();
-                                logger.Log($"Blocked: {processName} (ID: {processId}, Path: {filePath}, Hash: {hash}, User: {user}, Reason: {reason})");
-                                MessageBox.Show(
-                                    $"Запуск программы {processName} запрещён!\nПуть: {filePath}",
-                                    "Запрещено",
-                                    MessageBoxButtons.OK,
-                                    MessageBoxIcon.Error
-                                );
-                                return;
-                            }
-                            if (program.Hash == hash)
-                            {
-                                reason = "Hash match";
-                                process.Kill();
-                                logger.Log($"Blocked: {processName} (ID: {processId}, Path: {filePath}, Hash: {hash}, User: {user}, Reason: {reason})");
-                                MessageBox.Show(
-                                    $"Запуск программы {processName} запрещён!\nПуть: {filePath}",
-                                    "Запрещено",
-                                    MessageBoxButtons.OK,
-                                    MessageBoxIcon.Error
-                                );
-                                return;
-                            }
-                        }
-                    }
-                    catch (ArgumentException)
-                    {
-                        logger.Log($"Blocked: {processName} (ID: {processId}, User: {user}, Reason: {reason}) - Process terminated before inspection.");
-                        MessageBox.Show(
-                            $"Попытка запуска программы {processName} была заблокирована, но процесс завершился слишком быстро.",
-                            "Предупреждение",
-                            MessageBoxButtons.OK,
-                            MessageBoxIcon.Warning
-                        );
-                        return;
-                    }
-                }
-
-                // Проверяем по пути и хэшу
-                try
-                {
-                    Process process = Process.GetProcessById(int.Parse(processId));
-                    filePath = process.MainModule.FileName;
-                    hash = manager.CalculateHash(filePath);
-
-                    foreach (var program in cachedList.Programs)
-                    {
-                        if (program.Path == filePath)
-                        {
-                            reason = "Path match";
                             process.Kill();
-                            logger.Log($"Blocked: {processName} (ID: {processId}, Path: {filePath}, Hash: {hash}, User: {user}, Reason: {reason})");
-                            MessageBox.Show(
-                                $"Запуск программы {processName} запрещён!\nПуть: {filePath}",
-                                "Запрещено",
-                                MessageBoxButtons.OK,
-                                MessageBoxIcon.Error
-                            );
-                            return;
+                            string path = process.MainModule.FileName;
+                            string hash = manager.CalculateHash(path);
+                            string user = process.StartInfo.UserName;
+                            string reason = banned.Hash == hash ? "Hash match" : "Name match";
+                            MessageBox.Show($"The launch of {processName} is prohibited!", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                            logger.Log($"Blocked: {processName} (ID: {processId}, Path: {path}, Hash: {hash}, User: {user}, Reason: {reason})");
                         }
-                        if (program.Hash == hash)
+                        else
                         {
-                            reason = "Hash match";
-                            process.Kill();
-                            logger.Log($"Blocked: {processName} (ID: {processId}, Path: {filePath}, Hash: {hash}, User: {user}, Reason: {reason})");
-                            MessageBox.Show(
-                                $"Запуск программы {processName} запрещён!\nПуть: {filePath}",
-                                "Запрещено",
-                                MessageBoxButtons.OK,
-                                MessageBoxIcon.Error
-                            );
-                            return;
+                            logger.Log($"Process {processName} (ID: {processId}) already exited before termination.");
                         }
                     }
-                    // Не логируем разрешённые программы
+                    catch (Exception ex)
+                    {
+                        // Логируем ошибку, но не показываем MessageBox
+                        logger.Log($"Failed to terminate {processName} (ID: {processId}): {ex.Message}");
+                    }
+                    break;
                 }
-                catch (ArgumentException)
-                {
-                    // Не логируем, если процесс завершился, но не был заблокирован
-                }
-            }
-            catch (Exception ex)
-            {
-                logger.Log($"Error blocking {processName} (ID: {processId}): {ex.Message}, StackTrace: {ex.StackTrace}");
             }
         }
     }
