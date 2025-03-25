@@ -1,16 +1,11 @@
-﻿namespace BanPrograms
+﻿using System.Windows.Forms;
+
+namespace BanPrograms
 {
     partial class MainForm
     {
-        /// <summary>
-        /// Обязательная переменная конструктора.
-        /// </summary>
         private System.ComponentModel.IContainer components = null;
 
-        /// <summary>
-        /// Освободить все используемые ресурсы.
-        /// </summary>
-        /// <param name="disposing">истинно, если управляемый ресурс должен быть удален; иначе ложно.</param>
         protected override void Dispose(bool disposing)
         {
             if (disposing && (components != null))
@@ -20,104 +15,84 @@
             base.Dispose(disposing);
         }
 
-        #region Код, автоматически созданный конструктором форм Windows
-
-        /// <summary>
-        /// Требуемый метод для поддержки конструктора — не изменяйте 
-        /// содержимое этого метода с помощью редактора кода.
-        /// </summary>
         private void InitializeComponent()
         {
-            this.btnAdd = new System.Windows.Forms.Button();
-            this.btnRemove = new System.Windows.Forms.Button();
-            this.lstPrograms = new System.Windows.Forms.ListBox();
-            this.btnToggle = new MetroFramework.Controls.MetroToggle();
-            this.label1 = new System.Windows.Forms.Label();
-            this.label2 = new System.Windows.Forms.Label();
+            this.lstPrograms = new MaterialSkin.Controls.MaterialListView();
+            this.btnAdd = new MaterialSkin.Controls.MaterialButton();
+            this.btnRemove = new MaterialSkin.Controls.MaterialButton();
+            this.btnToggle = new MaterialSkin.Controls.MaterialSwitch();
+            this.lblToggle = new MaterialSkin.Controls.MaterialLabel();
             this.SuspendLayout();
-            // 
-            // btnAdd
-            // 
-            this.btnAdd.Location = new System.Drawing.Point(680, 482);
-            this.btnAdd.Name = "btnAdd";
-            this.btnAdd.Size = new System.Drawing.Size(132, 66);
-            this.btnAdd.TabIndex = 0;
-            this.btnAdd.Text = "Add";
-            this.btnAdd.UseVisualStyleBackColor = true;
-            this.btnAdd.Click += new System.EventHandler(this.btnAdd_Click);
-            // 
-            // btnRemove
-            // 
-            this.btnRemove.Location = new System.Drawing.Point(492, 482);
-            this.btnRemove.Name = "btnRemove";
-            this.btnRemove.Size = new System.Drawing.Size(142, 66);
-            this.btnRemove.TabIndex = 1;
-            this.btnRemove.Text = "Remove";
-            this.btnRemove.UseVisualStyleBackColor = true;
-            this.btnRemove.Click += new System.EventHandler(this.btnRemove_Click);
             // 
             // lstPrograms
             // 
-            this.lstPrograms.FormattingEnabled = true;
-            this.lstPrograms.ItemHeight = 25;
-            this.lstPrograms.Location = new System.Drawing.Point(65, 144);
+            this.lstPrograms.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
+                new System.Windows.Forms.ColumnHeader() { Text = "Program", Width = 450 }
+            });
+            this.lstPrograms.Location = new System.Drawing.Point(20, 80);
             this.lstPrograms.Name = "lstPrograms";
-            this.lstPrograms.Size = new System.Drawing.Size(351, 404);
-            this.lstPrograms.TabIndex = 3;
+            this.lstPrograms.Size = new System.Drawing.Size(460, 220);
+            this.lstPrograms.TabIndex = 0;
+            this.lstPrograms.View = System.Windows.Forms.View.Details;
+            this.lstPrograms.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            // 
+            // btnAdd
+            // 
+            this.btnAdd.Location = new System.Drawing.Point(200, 320);
+            this.btnAdd.Name = "btnAdd";
+            this.btnAdd.Size = new System.Drawing.Size(100, 40);
+            this.btnAdd.TabIndex = 1;
+            this.btnAdd.Text = "Add";
+            this.btnAdd.Click += new System.EventHandler(this.btnAdd_Click);
+            this.btnAdd.Anchor = AnchorStyles.Bottom;
+            // 
+            // btnRemove
+            // 
+            this.btnRemove.Location = new System.Drawing.Point(20, 320);
+            this.btnRemove.Name = "btnRemove";
+            this.btnRemove.Size = new System.Drawing.Size(100, 40);
+            this.btnRemove.TabIndex = 2;
+            this.btnRemove.Text = "Remove";
+            this.btnRemove.Click += new System.EventHandler(this.btnRemove_Click);
+            this.btnRemove.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
             // 
             // btnToggle
             // 
-            this.btnToggle.AutoSize = true;
-            this.btnToggle.Location = new System.Drawing.Point(627, 95);
+            this.btnToggle.Location = new System.Drawing.Point(450, 320);
             this.btnToggle.Name = "btnToggle";
-            this.btnToggle.Size = new System.Drawing.Size(80, 29);
-            this.btnToggle.TabIndex = 5;
-            this.btnToggle.Text = "Off";
-            this.btnToggle.UseVisualStyleBackColor = true;
+            this.btnToggle.Size = new System.Drawing.Size(40, 40);
+            this.btnToggle.TabIndex = 3;
             this.btnToggle.CheckedChanged += new System.EventHandler(this.btnToggle_CheckedChanged);
+            this.btnToggle.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
             // 
-            // label1
+            // lblToggle
             // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(613, 47);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(136, 25);
-            this.label1.TabIndex = 6;
-            this.label1.Text = "System state";
-            // 
-            // label2
-            // 
-            this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(65, 95);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(267, 25);
-            this.label2.TabIndex = 7;
-            this.label2.Text = "List of prohibited programs";
+            this.lblToggle.Location = new System.Drawing.Point(320, 320);
+            this.lblToggle.Name = "lblToggle";
+            this.lblToggle.Size = new System.Drawing.Size(120, 40);
+            this.lblToggle.Text = "Block System: ON/OFF";
+            this.lblToggle.TabIndex = 4;
+            this.lblToggle.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
             // 
             // MainForm
             // 
-            this.ClientSize = new System.Drawing.Size(901, 695);
-            this.Controls.Add(this.label2);
-            this.Controls.Add(this.label1);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.ClientSize = new System.Drawing.Size(500, 400);
+            this.Controls.Add(this.lblToggle);
             this.Controls.Add(this.btnToggle);
-            this.Controls.Add(this.lstPrograms);
             this.Controls.Add(this.btnRemove);
             this.Controls.Add(this.btnAdd);
+            this.Controls.Add(this.lstPrograms);
             this.Name = "MainForm";
             this.Text = "ProcessLock";
             this.ResumeLayout(false);
-            this.PerformLayout();
-
         }
 
-        #endregion
-
-        private System.Windows.Forms.Button btnAdd;
-        private System.Windows.Forms.Button btnRemove;
-        private System.Windows.Forms.ListBox lstPrograms;
-        private MetroFramework.Controls.MetroToggle btnToggle;
-        private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.Label label2;
+        private MaterialSkin.Controls.MaterialListView lstPrograms;
+        private MaterialSkin.Controls.MaterialButton btnAdd;
+        private MaterialSkin.Controls.MaterialButton btnRemove;
+        private MaterialSkin.Controls.MaterialSwitch btnToggle;
+        private MaterialSkin.Controls.MaterialLabel lblToggle;
     }
 }
-
