@@ -12,6 +12,8 @@ namespace BanPrograms
 {
     public class ProgramListManager
     {
+        
+        private readonly Logger logger = new Logger();
         private const string FilePath = "banned_programs.json";
 
         public ProgramList LoadList()
@@ -32,13 +34,23 @@ namespace BanPrograms
 
         public string CalculateHash(string filePath)
         {
-            using (var sha256 = SHA256.Create())
+            try
             {
-                using (var stream = File.OpenRead(filePath))
+                using (var sha256 = SHA256.Create())
                 {
-                    byte[] hash = sha256.ComputeHash(stream);
-                    return BitConverter.ToString(hash).Replace("-", "").ToLower();
+                    using (var stream = File.OpenRead(filePath))
+                    {
+                        byte[] hash = sha256.ComputeHash(stream);
+                        string hashString = BitConverter.ToString(hash).Replace("-", "").ToLower();
+                        logger.Log($"Calculated hash for {filePath}: {hashString}");
+                        return hashString;
+                    }
                 }
+            }
+            catch (Exception ex)
+            {
+                logger.Log($"Error calculating hash for {filePath}: {ex.Message}");
+                return string.Empty;
             }
         }
 

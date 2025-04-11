@@ -3,6 +3,7 @@ using System.Management;
 using System.Diagnostics;
 using System.Windows.Forms;
 using System.Security.Principal;
+using System.Threading.Tasks;
 
 namespace BanPrograms
 {
@@ -78,36 +79,83 @@ namespace BanPrograms
                 return;
             }
 
-            foreach (var banned in cachedList.Programs)
+            try
             {
-                if (processName.Equals(banned.Name, StringComparison.OrdinalIgnoreCase))
+                Process process = Process.GetProcessById(int.Parse(processId));
+                if (process.HasExited)
                 {
-                    try
-                    {
-                        Process process = Process.GetProcessById(int.Parse(processId));
-                        if (!process.HasExited) // Проверяем, не завершился ли процесс
-                        {
-                            process.Kill();
-                            string path = process.MainModule.FileName;
-                            string hash = manager.CalculateHash(path);
-                            string user = process.StartInfo.UserName;
-                            string reason = banned.Hash == hash ? "Hash match" : "Name match";
-                            MessageBox.Show($"The launch of {processName} is prohibited!", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                            logger.Log($"Blocked: {processName} (ID: {processId}, Path: {path}, Hash: {hash}, User: {user}, Reason: {reason})");
-                        }
-                        else
-                        {
-                            logger.Log($"Process {processName} (ID: {processId}) already exited before termination.");
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        // Логируем ошибку, но не показываем MessageBox
-                        logger.Log($"Failed to terminate {processName} (ID: {processId}): {ex.Message}");
-                    }
-                    break;
+                    logger.Log($"Process {processName} (ID: {processId}) already exited.");
+                    return;
                 }
+
+                // Получаем путь и хэш
+                string filePath = string.Empty;
+                string currentHash = string.Empty;
+                try
+                {
+                    filePath = process.MainModule.FileName;
+                    currentHash = manager.CalculateHash(filePath);
+                    logger.Log($"Process info: Path={filePath}, Hash={currentHash}");
+                }
+                catch (Exception ex)
+                {
+                    logger.Log($"Failed to get MainModule or hash for {processName} (ID: {processId}): {ex.Message}");
+                }
+
+                // Проверяем запрещённые программы
+                logger.Log($"Checking against {cachedList.Programs.Count} banned programs");
+                foreach (var banned in cachedList.Programs)
+                {
+                    bool isNameMatch = processName.Equals(banned.Name, StringComparison.OrdinalIgnoreCase);
+                    bool isPathMatch = !string.IsNullOrEmpty(filePath) && filePath.Equals(banned.Path, StringComparison.OrdinalIgnoreCase);
+                    bool isHashMatch = !string.IsNullOrEmpty(currentHash) && currentHash.Equals(banned.Hash, StringComparison.OrdinalIgnoreCase);
+
+                    logger.Log($"Comparing with banned: Name={banned.Name}, Path={banned.Path}, Hash={banned.Hash}, Matches: Name={isNameMatch}, Path={isPathMatch}, Hash={isHashMatch}");
+
+                    if (isNameMatch || isPathMatch || isHashMatch)
+                    {
+                        try
+                        {
+                            if (!process.HasExited)
+                            {
+                                process.Kill();
+                                logger.Log($"Blocked: {processName} (ID: {processId}, Path={filePath}, Hash={currentHash}, Reason={(isNameMatch ? "Name" : isPathMatch ? "Path" : "Hash")})");
+
+                                // Асинхронный MessageBox для первой проблемы
+                                Task.Run(() =>
+                                {
+                                    try
+                                    {
+                                        Application.OpenForms[0]?.Invoke((Action)(() =>
+                                        {
+                                            MessageBox.Show($"The launch of {processName} is prohibited!", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                                        }));
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        logger.Log($"Error showing MessageBox for {processName}: {ex.Message}");
+                                    }
+                                });
+                            }
+                            else
+                            {
+                                logger.Log($"Process {processName} (ID: {processId}) already exited before termination.");
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            logger.Log($"Error terminating {processName} (ID: {processId}): {ex.Message}");
+                        }
+                        return;
+                    }
+                }
+                logger.Log($"No match found for {processName}");
+            }
+            catch (Exception ex)
+            {
+                logger.Log($"Error processing {processName} (ID: {processId}): {ex.Message}");
             }
         }
+
     }
 }
