@@ -56,7 +56,7 @@ namespace BanPrograms
                     {
                         string[] owner = new string[2];
                         obj.InvokeMethod("GetOwner", owner);
-                        return $"{owner[1]}\\{owner[0]}"; // Формат: Domain\User
+                        return $"{owner[1]}\\{owner[0]}"; 
                     }
                 }
             }
@@ -88,7 +88,6 @@ namespace BanPrograms
                     return;
                 }
 
-                // Получаем путь и хэш
                 string filePath = string.Empty;
                 string currentHash = string.Empty;
                 try
@@ -102,7 +101,6 @@ namespace BanPrograms
                     logger.Log($"Failed to get MainModule or hash for {processName} (ID: {processId}): {ex.Message}");
                 }
 
-                // Проверяем запрещённые программы
                 logger.Log($"Checking against {cachedList.Programs.Count} banned programs");
                 foreach (var banned in cachedList.Programs)
                 {
@@ -121,7 +119,6 @@ namespace BanPrograms
                                 process.Kill();
                                 logger.Log($"Blocked: {processName} (ID: {processId}, Path={filePath}, Hash={currentHash}, Reason={(isNameMatch ? "Name" : isPathMatch ? "Path" : "Hash")})");
 
-                                // Асинхронный MessageBox для первой проблемы
                                 Task.Run(() =>
                                 {
                                     try
@@ -155,6 +152,111 @@ namespace BanPrograms
             {
                 logger.Log($"Error processing {processName} (ID: {processId}): {ex.Message}");
             }
+        }
+        public void CheckAndTerminateRunningProcesses()
+        {
+            if (!cachedList.Enabled)
+            {
+                logger.Log("System is disabled, skipping check for running processes.");
+                return;
+            }
+
+            logger.Log("Checking for already running banned processes...");
+
+            Process[] runningProcesses = Process.GetProcesses();
+            foreach (var process in runningProcesses)
+            {
+                try
+                {
+                    if (process.Id == Process.GetCurrentProcess().Id || string.IsNullOrEmpty(process.ProcessName))
+                    {
+                        continue;
+                    }
+
+                    string processName = process.ProcessName + ".exe";
+                    string filePath = string.Empty;
+                    string currentHash = string.Empty;
+
+                    try
+                    {
+                        filePath = process.MainModule.FileName;
+                        currentHash = manager.CalculateHash(filePath);
+                        logger.Log($"Running process: {processName} (ID: {process.Id}), Path={filePath}, Hash={currentHash}");
+                    }
+                    catch (Exception ex)
+                    {
+                        logger.Log($"Failed to get MainModule for running process {processName} (ID: {process.Id}): {ex.Message}");
+
+                        try
+                        {
+                            using (var searcher = new ManagementObjectSearcher($"SELECT ExecutablePath FROM Win32_Process WHERE ProcessId = {process.Id}"))
+                            {
+                                foreach (ManagementObject obj in searcher.Get())
+                                {
+                                    filePath = obj["ExecutablePath"]?.ToString();
+                                    if (!string.IsNullOrEmpty(filePath))
+                                    {
+                                        currentHash = manager.CalculateHash(filePath);
+                                        logger.Log($"Running process (via WMI): {processName} (ID: {process.Id}), Path={filePath}, Hash={currentHash}");
+                                    }
+                                    break;
+                                }
+                            }
+                        }
+                        catch (Exception wmiEx)
+                        {
+                            logger.Log($"Failed to get path via WMI for running process {processName} (ID: {process.Id}): {wmiEx.Message}");
+                        }
+                    }
+
+
+                    foreach (var banned in cachedList.Programs)
+                    {
+                        bool isNameMatch = processName.Equals(banned.Name, StringComparison.OrdinalIgnoreCase);
+                        bool isPathMatch = !string.IsNullOrEmpty(filePath) && filePath.Equals(banned.Path, StringComparison.OrdinalIgnoreCase);
+                        bool isHashMatch = !string.IsNullOrEmpty(currentHash) && currentHash.Equals(banned.Hash, StringComparison.OrdinalIgnoreCase);
+
+                        if (isNameMatch || isPathMatch || isHashMatch)
+                        {
+                            try
+                            {
+                                if (!process.HasExited)
+                                {
+                                    process.Kill();
+                                    logger.Log($"Terminated running process: {processName} (ID: {process.Id}, Path={filePath}, Hash={currentHash}, Reason={(isNameMatch ? "Name" : isPathMatch ? "Path" : "Hash")})");
+
+
+                                    Task.Run(() =>
+                                    {
+                                        try
+                                        {
+                                            Application.OpenForms[0]?.Invoke((Action)(() =>
+                                            {
+                                                MessageBox.Show($"The running process {processName} was terminated as it is prohibited!", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                                            }));
+                                        }
+                                        catch (Exception ex)
+                                        {
+                                            logger.Log($"Error showing MessageBox for {processName}: {ex.Message}");
+                                        }
+                                    });
+                                }
+                            }
+                            catch (Exception ex)
+                            {
+                                logger.Log($"Error terminating running process {processName} (ID: {process.Id}): {ex.Message}");
+                            }
+                            break;
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    logger.Log($"Error checking running process {process.ProcessName} (ID: {process.Id}): {ex.Message}");
+                }
+            }
+
+            logger.Log("Finished checking running processes.");
         }
 
     }

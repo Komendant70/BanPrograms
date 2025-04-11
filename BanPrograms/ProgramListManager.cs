@@ -23,12 +23,12 @@ namespace BanPrograms
                 return new ProgramList { Enabled = false, Programs = new List<ProgramInfo>() };
             }
             string json = File.ReadAllText(FilePath);
-            return JsonConvert.DeserializeObject<ProgramList>(json); // Прямое десериализация строки
+            return JsonConvert.DeserializeObject<ProgramList>(json); 
         }
 
         public void SaveList(ProgramList list)
         {
-            string json = JsonConvert.SerializeObject(list, Formatting.Indented); // Сериализация с отступами
+            string json = JsonConvert.SerializeObject(list, Formatting.Indented); 
             File.WriteAllText(FilePath, json);
         }
 

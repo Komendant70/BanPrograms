@@ -13,7 +13,6 @@ namespace BanPrograms
 
         public Logger()
         {
-            // Указываем путь к файлу в папке с исполняемым файлом
             string exePath = AppDomain.CurrentDomain.BaseDirectory;
             LogFile = Path.Combine(exePath, "attempts.log");
         }
@@ -27,7 +26,6 @@ namespace BanPrograms
             }
             catch (Exception ex)
             {
-                // Логируем ошибку в консоль или другой файл, чтобы не потерять информацию
                 Console.WriteLine($"Failed to write to log file: {ex.Message}");
             }
         }

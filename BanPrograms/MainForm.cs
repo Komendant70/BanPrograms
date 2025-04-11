@@ -10,14 +10,15 @@ namespace BanPrograms
 {
     public partial class MainForm : MaterialForm
     {
+        private Logger logger = new Logger();
         private ProgramListManager manager = new ProgramListManager();
         private MonitorService monitor = new MonitorService();
         private string currentProgramPath;
-        private bool isFullScreen = false; // Флаг для отслеживания полноэкранного режима
-        private FormBorderStyle originalFormBorderStyle; // Для сохранения исходного стиля окна
-        private FormWindowState originalWindowState; // Для сохранения исходного состояния окна
-        private Size originalSize; // Для сохранения исходного размера окна
-        private Point originalLocation; // Для сохранения исходного положения окна
+        private bool isFullScreen = false;
+        private FormBorderStyle originalFormBorderStyle; 
+        private FormWindowState originalWindowState; 
+        private Size originalSize; 
+        private Point originalLocation; 
 
         public MainForm()
         {
@@ -31,17 +32,14 @@ namespace BanPrograms
             this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
             this.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
 
-            // Сохраняем исходные параметры окна
             originalFormBorderStyle = this.FormBorderStyle;
             originalWindowState = this.WindowState;
             originalSize = this.Size;
             originalLocation = this.Location;
 
-            // Включаем обработку клавиш
+      
             this.KeyPreview = true;
             this.KeyDown += new KeyEventHandler(MainForm_KeyDown);
-
-            // Подписываемся на событие изменения размера формы
             this.Resize += new EventHandler(MainForm_Resize);
 
             CheckAdminRights();
@@ -50,12 +48,12 @@ namespace BanPrograms
 
         private void MainForm_KeyDown(object sender, KeyEventArgs e)
         {
-            if (e.KeyCode == Keys.F11) // Переключение полноэкранного режима по F11
+            if (e.KeyCode == Keys.F11)
             {
                 ToggleFullScreen();
                 e.Handled = true;
             }
-            else if (e.KeyCode == Keys.Escape && isFullScreen) // Выход из полноэкранного режима по Esc
+            else if (e.KeyCode == Keys.Escape && isFullScreen) 
             {
                 ToggleFullScreen();
                 e.Handled = true;
@@ -66,7 +64,7 @@ namespace BanPrograms
         {
             if (!isFullScreen)
             {
-                // Переходим в полноэкранный режим
+                
                 originalFormBorderStyle = this.FormBorderStyle;
                 originalWindowState = this.WindowState;
                 originalSize = this.Size;
@@ -78,7 +76,7 @@ namespace BanPrograms
             }
             else
             {
-                // Возвращаемся к обычному режиму
+              
                 this.FormBorderStyle = originalFormBorderStyle;
                 this.WindowState = originalWindowState;
                 this.Size = originalSize;
@@ -86,57 +84,52 @@ namespace BanPrograms
                 isFullScreen = false;
             }
 
-            // Масштабируем элементы управления
+     
             ScaleControls();
         }
 
         private void MainForm_Resize(object sender, EventArgs e)
         {
-            // Масштабируем элементы при изменении размера окна
+   
             ScaleControls();
         }
 
         private void ScaleControls()
         {
-            // Вычисляем коэффициент масштабирования относительно исходного размера (500x400)
+   
             float scaleX = (float)this.ClientSize.Width / 500f;
             float scaleY = (float)this.ClientSize.Height / 400f;
-            float scale = Math.Min(scaleX, scaleY); // Используем минимальный коэффициент для пропорционального масштабирования
+            float scale = Math.Min(scaleX, scaleY); 
 
-            // Масштабируем шрифты
-            float newFontSize = 9f * scale; // Исходный размер шрифта 9
-            newFontSize = Math.Max(8f, Math.Min(newFontSize, 20f)); // Ограничиваем размер шрифта от 8 до 20
+            float newFontSize = 9f * scale; 
+            newFontSize = Math.Max(8f, Math.Min(newFontSize, 20f)); 
             this.Font = new System.Drawing.Font("Segoe UI", newFontSize, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             btnAdd.Font = new System.Drawing.Font("Segoe UI", newFontSize, System.Drawing.FontStyle.Regular);
             btnRemove.Font = new System.Drawing.Font("Segoe UI", newFontSize, System.Drawing.FontStyle.Regular);
             lblToggle.Font = new System.Drawing.Font("Segoe UI", newFontSize, System.Drawing.FontStyle.Regular);
 
-            // Масштабируем размеры кнопок
+
             btnAdd.Size = new Size((int)(100 * scale), (int)(40 * scale));
             btnRemove.Size = new Size((int)(100 * scale), (int)(40 * scale));
             btnToggle.Size = new Size((int)(40 * scale), (int)(40 * scale));
             lblToggle.Size = new Size((int)(120 * scale), (int)(40 * scale));
 
-            // Пересчитываем положение кнопок
-            btnRemove.Location = new Point(20, this.ClientSize.Height - btnRemove.Height - 20); // 20 пикселей от нижнего края
-            btnAdd.Location = new Point((this.ClientSize.Width - btnAdd.Width) / 2, this.ClientSize.Height - btnAdd.Height - 20); // Центрируем по горизонтали
-            lblToggle.Location = new Point(this.ClientSize.Width - lblToggle.Width - btnToggle.Width - 40, this.ClientSize.Height - lblToggle.Height - 20); // Справа, с отступом
-            btnToggle.Location = new Point(this.ClientSize.Width - btnToggle.Width - 20, this.ClientSize.Height - btnToggle.Height - 20); // Справа, рядом с lblToggle
+            btnRemove.Location = new Point(20, this.ClientSize.Height - btnRemove.Height - 20); 
+            btnAdd.Location = new Point((this.ClientSize.Width - btnAdd.Width) / 2, this.ClientSize.Height - btnAdd.Height - 20); 
+            lblToggle.Location = new Point(this.ClientSize.Width - lblToggle.Width - btnToggle.Width - 40, this.ClientSize.Height - lblToggle.Height - 20); 
+            btnToggle.Location = new Point(this.ClientSize.Width - btnToggle.Width - 20, this.ClientSize.Height - btnToggle.Height - 20); 
 
-            // Масштабируем ширину колонки в lstPrograms
             if (lstPrograms.Columns.Count > 0)
             {
                 lstPrograms.Columns[0].Width = (int)(450 * scale);
             }
 
-            // Отладочные сообщения для проверки положения кнопок
             System.Diagnostics.Debug.WriteLine($"btnRemove Location: {btnRemove.Location}");
             System.Diagnostics.Debug.WriteLine($"btnAdd Location: {btnAdd.Location}");
             System.Diagnostics.Debug.WriteLine($"lblToggle Location: {lblToggle.Location}");
             System.Diagnostics.Debug.WriteLine($"btnToggle Location: {btnToggle.Location}");
             System.Diagnostics.Debug.WriteLine($"ClientSize: {this.ClientSize}");
 
-            // Принудительно перерисовываем форму
             this.Refresh();
         }
 
@@ -201,6 +194,10 @@ namespace BanPrograms
                     });
                     manager.SaveList(list);
                     monitor.UpdateCache();
+                    logger.Log($"Added program: {ofd.FileName}, Hash: {hash}");
+
+                    monitor.CheckAndTerminateRunningProcesses();
+
                     LoadProgramList();
                 }
             }
@@ -240,10 +237,12 @@ namespace BanPrograms
                     btnToggle.Checked = false;
                     lblToggle.Text = "Block System: OFF";
                 }
+
                 else
                 {
                     System.Diagnostics.Debug.WriteLine("System enabled, starting monitor...");
                     monitor.Start();
+                    monitor.CheckAndTerminateRunningProcesses();
                 }
             }
             else
