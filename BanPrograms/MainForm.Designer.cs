@@ -28,30 +28,27 @@ namespace BanPrograms
             // 
             // lstPrograms
             // 
-            this.lstPrograms.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
             this.lstPrograms.AutoSizeTable = false;
             this.lstPrograms.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
             this.lstPrograms.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.lstPrograms.Depth = 0;
+            this.lstPrograms.Dock = System.Windows.Forms.DockStyle.Top;
             this.lstPrograms.FullRowSelect = true;
             this.lstPrograms.HideSelection = false;
-            this.lstPrograms.Location = new System.Drawing.Point(40, 154);
+            this.lstPrograms.Location = new System.Drawing.Point(6, 123);
             this.lstPrograms.Margin = new System.Windows.Forms.Padding(6);
             this.lstPrograms.MinimumSize = new System.Drawing.Size(400, 192);
             this.lstPrograms.MouseLocation = new System.Drawing.Point(-1, -1);
             this.lstPrograms.MouseState = MaterialSkin.MouseState.OUT;
             this.lstPrograms.Name = "lstPrograms";
             this.lstPrograms.OwnerDraw = true;
-            this.lstPrograms.Size = new System.Drawing.Size(994, 434);
+            this.lstPrograms.Size = new System.Drawing.Size(1062, 455);
             this.lstPrograms.TabIndex = 0;
             this.lstPrograms.UseCompatibleStateImageBehavior = false;
             this.lstPrograms.View = System.Windows.Forms.View.Details;
             this.lstPrograms.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
-                new System.Windows.Forms.ColumnHeader() { Text = "Program", Width = 450 }
+                new System.Windows.Forms.ColumnHeader() { Text = "Program", Width = 1000 }
             });
-
             // 
             // btnAdd
             // 
@@ -110,13 +107,14 @@ namespace BanPrograms
             // lblToggle
             // 
             this.lblToggle.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.lblToggle.AutoSize = true;
             this.lblToggle.Depth = 0;
             this.lblToggle.Font = new System.Drawing.Font("Roboto", 14F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Pixel);
             this.lblToggle.Location = new System.Drawing.Point(769, 658);
             this.lblToggle.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
             this.lblToggle.MouseState = MaterialSkin.MouseState.HOVER;
             this.lblToggle.Name = "lblToggle";
-            this.lblToggle.Size = new System.Drawing.Size(180, 22);
+            this.lblToggle.Size = new System.Drawing.Size(163, 19);
             this.lblToggle.TabIndex = 4;
             this.lblToggle.Text = "Block System: ON/OFF";
             // 
@@ -160,8 +158,10 @@ namespace BanPrograms
             this.Controls.Add(this.btnAdd);
             this.Controls.Add(this.lstPrograms);
             this.Margin = new System.Windows.Forms.Padding(6);
+            this.MaximizeBox = false;
             this.Name = "MainForm";
             this.Padding = new System.Windows.Forms.Padding(6, 123, 6, 6);
+            this.Sizable = false;
             this.Text = "ProcessLock";
             this.ResumeLayout(false);
             this.PerformLayout();

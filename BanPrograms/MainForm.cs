@@ -169,8 +169,7 @@ namespace BanPrograms
             this.Font = new System.Drawing.Font("Segoe UI", newFontSize, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             btnAdd.Font = new System.Drawing.Font("Segoe UI", newFontSize, System.Drawing.FontStyle.Regular);
             btnRemove.Font = new System.Drawing.Font("Segoe UI", newFontSize, System.Drawing.FontStyle.Regular);
-            lblToggle.Font = new System.Drawing.Font("Segoe UI", newFontSize, System.Drawing.FontStyle.Regular);
-            materialLabel1.Font = new System.Drawing.Font("Segoe UI", newFontSize, System.Drawing.FontStyle.Regular);
+            
 
             btnAdd.Size = new Size((int)(100 * scale), (int)(40 * scale));
             btnRemove.Size = new Size((int)(100 * scale), (int)(40 * scale));
@@ -180,9 +179,7 @@ namespace BanPrograms
 
             btnRemove.Location = new Point(20, this.ClientSize.Height - btnRemove.Height - 20);
             btnAdd.Location = new Point((this.ClientSize.Width - btnAdd.Width) / 2, this.ClientSize.Height - btnAdd.Height - 20);
-            lblToggle.Location = new Point(this.ClientSize.Width - lblToggle.Width - btnToggle.Width - 40, this.ClientSize.Height - lblToggle.Height - 20);
-            btnToggle.Location = new Point(this.ClientSize.Width - btnToggle.Width - 20, this.ClientSize.Height - btnToggle.Height - 20);
-            materialLabel1.Location = new Point(this.ClientSize.Width - materialLabel1.Width - btnEnableStartup.Width - 40, this.ClientSize.Height - materialLabel1.Height - 60);
+          
 
             if (lstPrograms.Columns.Count > 0)
             {
