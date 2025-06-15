@@ -9,12 +9,13 @@ namespace BanPrograms
 {
     public class Logger
     {
-        private readonly string LogFile;
+        private readonly string _logFile;
+        public string LogFile => _logFile;
 
         public Logger()
         {
             string exePath = AppDomain.CurrentDomain.BaseDirectory;
-            LogFile = Path.Combine(exePath, "attempts.log");
+            _logFile = Path.Combine(exePath, "attempts.log");
         }
 
         public void Log(string message)

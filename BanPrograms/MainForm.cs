@@ -9,6 +9,7 @@ using Microsoft.Win32;
 using System.Security.Principal;
 using Microsoft.Win32.TaskScheduler;
 using System.Linq;
+using System.Diagnostics;
 
 namespace BanPrograms
 {
@@ -24,6 +25,7 @@ namespace BanPrograms
         private Size originalSize;
         private Point originalLocation;
         private bool isAdmin;
+        private readonly Logger _logger;
 
         public MainForm()
         {
@@ -36,6 +38,7 @@ namespace BanPrograms
             materialSkinManager.Theme = MaterialSkinManager.Themes.LIGHT;
             materialSkinManager.ColorScheme = new ColorScheme(Primary.BlueGrey800, Primary.BlueGrey900, Primary.BlueGrey500, Accent.LightBlue200, TextShade.WHITE);
             logger.Log("MaterialSkin initialized successfully.");
+            _logger = new Logger();
 
             // Настройки формы
             this.AutoScaleMode = AutoScaleMode.Dpi;
@@ -70,14 +73,20 @@ namespace BanPrograms
                 // Отключаем элементы управления
                 btnAdd.Enabled = false;
                 btnRemove.Enabled = false;
-                btnToggle.Enabled = false;
+                btnToggle.Enabled = false; // Отключаем переключатель для неадминов
                 lstPrograms.Enabled = true; // Только для чтения
                 lstPrograms.Columns[0].Text = "Program (Read-Only)";
 
-                // Отключаем переключатель автозагрузки
-                if (this.Controls.OfType<MaterialLabel>().Any(b => b.Name == "btnEnableStartup"))
+                // Отключаем переключатель автозагрузки (используем MaterialSwitch)
+                if (this.Controls.OfType<MaterialSwitch>().Any(b => b.Name == "btnEnableStartup"))
                 {
-                    this.Controls.OfType<MaterialLabel>().First(b => b.Name == "btnEnableStartup").Enabled = false;
+                    this.Controls.OfType<MaterialSwitch>().First(b => b.Name == "btnEnableStartup").Enabled = false;
+                }
+
+                // Отключаем кнопку открытия лог-файла
+                if (this.Controls.OfType<MaterialButton>().Any(b => b.Name == "materialButton1"))
+                {
+                    this.Controls.OfType<MaterialButton>().First(b => b.Name == "materialButton1").Enabled = false;
                 }
 
                 // Показываем сообщение
@@ -169,17 +178,21 @@ namespace BanPrograms
             this.Font = new System.Drawing.Font("Segoe UI", newFontSize, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             btnAdd.Font = new System.Drawing.Font("Segoe UI", newFontSize, System.Drawing.FontStyle.Regular);
             btnRemove.Font = new System.Drawing.Font("Segoe UI", newFontSize, System.Drawing.FontStyle.Regular);
-            
+            btnToggle.Font = new System.Drawing.Font("Segoe UI", newFontSize, System.Drawing.FontStyle.Regular);
+            materialButton1.Font = new System.Drawing.Font("Segoe UI", newFontSize, System.Drawing.FontStyle.Regular);
 
             btnAdd.Size = new Size((int)(100 * scale), (int)(40 * scale));
             btnRemove.Size = new Size((int)(100 * scale), (int)(40 * scale));
             btnToggle.Size = new Size((int)(40 * scale), (int)(40 * scale));
             lblToggle.Size = new Size((int)(120 * scale), (int)(40 * scale));
             materialLabel1.Size = new Size((int)(120 * scale), (int)(40 * scale));
+            materialButton1.Size = new Size((int)(100 * scale), (int)(40 * scale));
 
             btnRemove.Location = new Point(20, this.ClientSize.Height - btnRemove.Height - 20);
             btnAdd.Location = new Point((this.ClientSize.Width - btnAdd.Width) / 2, this.ClientSize.Height - btnAdd.Height - 20);
-          
+            materialButton1.Location = new Point((this.ClientSize.Width - materialButton1.Width) - 20, this.ClientSize.Height - materialButton1.Height - 20);
+            btnToggle.Location = new Point((int)(this.ClientSize.Width - btnToggle.Width - 20 * scale), (int)(this.ClientSize.Height - btnToggle.Height - 60 * scale));
+            lblToggle.Location = new Point((int)(this.ClientSize.Width - lblToggle.Width - btnToggle.Width - 40 * scale), (int)(this.ClientSize.Height - lblToggle.Height - 60 * scale));
 
             if (lstPrograms.Columns.Count > 0)
             {
@@ -188,8 +201,9 @@ namespace BanPrograms
 
             System.Diagnostics.Debug.WriteLine($"btnRemove Location: {btnRemove.Location}");
             System.Diagnostics.Debug.WriteLine($"btnAdd Location: {btnAdd.Location}");
-            System.Diagnostics.Debug.WriteLine($"lblToggle Location: {lblToggle.Location}");
+            System.Diagnostics.Debug.WriteLine($"materialButton1 Location: {materialButton1.Location}");
             System.Diagnostics.Debug.WriteLine($"btnToggle Location: {btnToggle.Location}");
+            System.Diagnostics.Debug.WriteLine($"lblToggle Location: {lblToggle.Location}");
             System.Diagnostics.Debug.WriteLine($"materialLabel1 Location: {materialLabel1.Location}");
             System.Diagnostics.Debug.WriteLine($"ClientSize: {this.ClientSize}");
 
@@ -218,7 +232,8 @@ namespace BanPrograms
 
             btnToggle.Checked = list.Enabled;
             lblToggle.Text = btnToggle.Checked ? "Block System: ON" : "Block System: OFF";
-            btnToggle.Enabled = list.Programs.Count > 0 && isAdmin;
+            // Убираем проверку isAdmin здесь, так как переключатель уже отключён для неадминов
+            btnToggle.Enabled = list.Programs.Count > 0;
             if (list.Enabled && list.Programs.Count == 0)
             {
                 list.Enabled = false;
@@ -399,6 +414,28 @@ namespace BanPrograms
             LoadProgramList();
         }
 
-        
+        private void materialButton1_Click(object sender, EventArgs e)
+        {
+            if (!isAdmin)
+            {
+                logger.Log("Non-admin user attempted to open a log file.");
+                return;
+            }
+            string logFilePath = _logger.LogFile; // Получаем путь к лог-файлу
+
+            if (File.Exists(logFilePath))
+            {
+                // Открываем файл в программе по умолчанию (например, Блокнот)
+                Process.Start(new ProcessStartInfo
+                {
+                    FileName = logFilePath,
+                    UseShellExecute = true
+                });
+            }
+            else
+            {
+                MessageBox.Show("Лог-файл не найден!", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
     }
 }

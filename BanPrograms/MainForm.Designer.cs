@@ -24,6 +24,7 @@ namespace BanPrograms
             this.lblToggle = new MaterialSkin.Controls.MaterialLabel();
             this.btnEnableStartup = new MaterialSkin.Controls.MaterialSwitch();
             this.materialLabel1 = new MaterialSkin.Controls.MaterialLabel();
+            this.materialButton1 = new MaterialSkin.Controls.MaterialButton();
             this.SuspendLayout();
             // 
             // lstPrograms
@@ -54,11 +55,12 @@ namespace BanPrograms
             // 
             this.btnAdd.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
             this.btnAdd.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            this.btnAdd.Cursor = System.Windows.Forms.Cursors.Hand;
             this.btnAdd.Density = MaterialSkin.Controls.MaterialButton.MaterialButtonDensity.Default;
             this.btnAdd.Depth = 0;
             this.btnAdd.HighEmphasis = true;
             this.btnAdd.Icon = null;
-            this.btnAdd.Location = new System.Drawing.Point(437, 667);
+            this.btnAdd.Location = new System.Drawing.Point(210, 667);
             this.btnAdd.Margin = new System.Windows.Forms.Padding(8, 12, 8, 12);
             this.btnAdd.MouseState = MaterialSkin.MouseState.HOVER;
             this.btnAdd.Name = "btnAdd";
@@ -74,6 +76,7 @@ namespace BanPrograms
             // 
             this.btnRemove.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.btnRemove.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            this.btnRemove.Cursor = System.Windows.Forms.Cursors.Hand;
             this.btnRemove.Density = MaterialSkin.Controls.MaterialButton.MaterialButtonDensity.Default;
             this.btnRemove.Depth = 0;
             this.btnRemove.HighEmphasis = true;
@@ -93,6 +96,7 @@ namespace BanPrograms
             // btnToggle
             // 
             this.btnToggle.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnToggle.Cursor = System.Windows.Forms.Cursors.Hand;
             this.btnToggle.Depth = 0;
             this.btnToggle.Location = new System.Drawing.Point(974, 626);
             this.btnToggle.Margin = new System.Windows.Forms.Padding(0);
@@ -121,6 +125,7 @@ namespace BanPrograms
             // btnEnableStartup
             // 
             this.btnEnableStartup.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnEnableStartup.Cursor = System.Windows.Forms.Cursors.Hand;
             this.btnEnableStartup.Depth = 0;
             this.btnEnableStartup.Location = new System.Drawing.Point(974, 689);
             this.btnEnableStartup.Margin = new System.Windows.Forms.Padding(0);
@@ -141,15 +146,37 @@ namespace BanPrograms
             this.materialLabel1.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
             this.materialLabel1.MouseState = MaterialSkin.MouseState.HOVER;
             this.materialLabel1.Name = "materialLabel1";
-            this.materialLabel1.Size = new System.Drawing.Size(170, 18);
+            this.materialLabel1.Size = new System.Drawing.Size(199, 22);
             this.materialLabel1.TabIndex = 6;
-            this.materialLabel1.Text = "Block System: ON/OFF";
+            this.materialLabel1.Text = "Startup: ON/OFF";
+            // 
+            // materialButton1
+            // 
+            this.materialButton1.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            this.materialButton1.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.materialButton1.Density = MaterialSkin.Controls.MaterialButton.MaterialButtonDensity.Default;
+            this.materialButton1.Depth = 0;
+            this.materialButton1.HighEmphasis = true;
+            this.materialButton1.Icon = null;
+            this.materialButton1.Location = new System.Drawing.Point(371, 667);
+            this.materialButton1.Margin = new System.Windows.Forms.Padding(4, 6, 4, 6);
+            this.materialButton1.MouseState = MaterialSkin.MouseState.HOVER;
+            this.materialButton1.Name = "materialButton1";
+            this.materialButton1.NoAccentTextColor = System.Drawing.Color.Empty;
+            this.materialButton1.Size = new System.Drawing.Size(82, 36);
+            this.materialButton1.TabIndex = 8;
+            this.materialButton1.Text = "log file";
+            this.materialButton1.Type = MaterialSkin.Controls.MaterialButton.MaterialButtonType.Contained;
+            this.materialButton1.UseAccentColor = false;
+            this.materialButton1.UseVisualStyleBackColor = true;
+            this.materialButton1.Click += new System.EventHandler(this.materialButton1_Click);
             // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(12F, 25F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1074, 780);
+            this.Controls.Add(this.materialButton1);
             this.Controls.Add(this.materialLabel1);
             this.Controls.Add(this.btnEnableStartup);
             this.Controls.Add(this.lblToggle);
@@ -175,5 +202,6 @@ namespace BanPrograms
         private MaterialSkin.Controls.MaterialLabel lblToggle;
         private MaterialSkin.Controls.MaterialSwitch btnEnableStartup;
         private MaterialSkin.Controls.MaterialLabel materialLabel1;
+        private MaterialSkin.Controls.MaterialButton materialButton1;
     }
 }
